@@ -15,13 +15,25 @@ export default function RegisterPage() {
         
         <form className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <input placeholder="First Name" className="px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" />
-            <input placeholder="Last Name" className="px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" />
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-slate-700 mb-1">First name</label>
+              <input id="firstName" name="firstName" placeholder="First Name" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" />
+            </div>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 mb-1">Last name</label>
+              <input id="lastName" name="lastName" placeholder="Last Name" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" />
+            </div>
           </div>
 
-          <input type="email" placeholder="Email" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" />
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <input id="email" name="email" type="email" placeholder="Email" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" />
+          </div>
 
-          <input type="password" placeholder="Password (min 8 chars)" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" />
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+            <input id="password" name="password" type="password" placeholder="Password (min 8 chars)" className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none" />
+          </div>
 
           <button
             type="submit"
