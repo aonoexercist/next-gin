@@ -14,7 +14,28 @@ export default function Dashboard() {
     }
   }, [user, loading])
 
-  if (loading) return <p>Loading...</p>
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-slate-900" />
+      </div>
+    )
+  }
 
-  return <div>Welcome {user?.email}</div>
+  return (
+    <div className="min-h-screen bg-slate-100 p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+          <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+          <p className="text-slate-600 mt-2">Welcome back, {user?.email}</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6 mt-6">
+          <div className="bg-white p-5 rounded-xl shadow border">Card 1</div>
+          <div className="bg-white p-5 rounded-xl shadow border">Card 2</div>
+          <div className="bg-white p-5 rounded-xl shadow border">Card 3</div>
+        </div>
+      </div>
+    </div>
+  )
 }
