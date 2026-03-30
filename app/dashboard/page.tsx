@@ -1,9 +1,10 @@
 "use client"
 
+import React, { useEffect } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
 import { logout } from "@/lib/auth"
+import Todos from "./Todos"
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -54,10 +55,14 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mt-6">
-          <div className="bg-white p-5 rounded-xl shadow border">Card 1</div>
-          <div className="bg-white p-5 rounded-xl shadow border">Card 2</div>
-          <div className="bg-white p-5 rounded-xl shadow border">Card 3</div>
+        <div className="mt-6">
+          {/* Todos component */}
+          {/* eslint-disable-next-line @next/next/no-component-definition */}
+          {/* Lazy import client component to avoid SSR issues */}
+          <React.Suspense fallback={<div>Loading todos…</div>}>
+            {/* @ts-ignore */}
+            <Todos />
+          </React.Suspense>
         </div>
       </div>
     </div>
