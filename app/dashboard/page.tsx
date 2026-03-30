@@ -11,7 +11,7 @@ export default function Dashboard() {
 
   const handleLogout = async () => {
     try {
-      await logout()
+      confirm("Are you sure you want to logout?") && await logout();
     } catch (err) {
       // swallow errors and continue to redirect
       console.error("Logout failed", err)

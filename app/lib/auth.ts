@@ -31,5 +31,5 @@ export async function getMe() {
 }
 
 export async function logout() {
-  await apiFetch("/logout", { method: "POST" })
+  await apiFetch("/api/logout", { method: "POST" })
 }
