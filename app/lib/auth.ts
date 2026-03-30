@@ -23,7 +23,7 @@ export async function register(name: string, email: string, password: string) {
 }
 
 export async function getMe() {
-  const res = await apiFetch("/api/me")
+  const res = await apiFetch("/services/me")
 
   if (!res.ok) return null
 
@@ -31,5 +31,5 @@ export async function getMe() {
 }
 
 export async function logout() {
-  await apiFetch("/api/logout", { method: "POST" })
+  await apiFetch("/services/logout", { method: "POST" })
 }
