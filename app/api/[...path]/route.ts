@@ -4,7 +4,8 @@ const API_URL = process.env.API_URL!
 
 async function handler(
   req: NextRequest,
-  context: { params: Promise<{ path?: string[] }> }
+  context: { params: Promise<{ path?: string[] }> },
+  options: { _retry?: boolean } = {}
 ) {
   const params = await context.params
   const path = params?.path || []
@@ -22,6 +23,25 @@ async function handler(
         ? await req.text()
         : undefined,
   })
+
+  // Handle 401 by trying to refresh token
+  if (res.status === 401 && !options._retry) {
+    options._retry = true
+
+    const refresh = await fetch("/auth/refresh", {
+      method: "POST",
+      credentials: "include",
+    })
+
+    if (refresh.ok) {
+      return fetch(url, {
+        ...options,
+        credentials: "include",
+      })
+    }
+
+    window.location.href = "/login"
+  }
 
   const data = await res.text()
 
