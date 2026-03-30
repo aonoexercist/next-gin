@@ -11,10 +11,10 @@ export async function login(email: string, password: string) {
   return res.json()
 }
 
-export async function register(email: string, password: string) {
+export async function register(name: string, email: string, password: string) {
   const res = await apiFetch("/auth/register", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ name, email, password }),
   })
 
   if (!res.ok) throw new Error("Register failed")
