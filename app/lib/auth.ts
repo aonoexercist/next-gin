@@ -23,17 +23,11 @@ export async function register(name: string, email: string, password: string) {
 }
 
 export async function getMe() {
-  // const res = await apiFetch("/me")
+  const res = await apiFetch("/api/me")
 
-  // if (!res.ok) return null
+  if (!res.ok) return null
 
-  // return res.json()
-
-  return {
-    id: 1,
-    email: "john@example.com",
-    name: "John Doe",
-  }
+  return res.json()
 }
 
 export async function logout() {
