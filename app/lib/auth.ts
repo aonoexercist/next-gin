@@ -31,5 +31,14 @@ export async function getMe() {
 }
 
 export async function logout() {
-  await apiFetch("/services/logout", { method: "POST" })
+  await apiFetch("/auth/logout", { method: "POST" })
+}
+
+export async function refreshToken() {
+  const res = await apiFetch("/auth/refresh", { method: "POST" })
+
+  if (!res.ok) {
+    await logout()
+    throw new Error("Session expired")
+  }
 }
