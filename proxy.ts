@@ -7,7 +7,7 @@ const protectedRoutes = ["/dashboard"];
 
 
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Get token from cookies
