@@ -19,7 +19,6 @@ export const useTodosStore = create<TodosState>((set, get) => ({
   setTodos: (t) => set({ todos: t }),
   load: async () => {
     const res = await apiFetch("/services/todos")
-    console.log('Fetched todos:', res)
     if (!res.ok) return
     const data = await res.json()
     set({ todos: data })
