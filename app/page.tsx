@@ -1,4 +1,7 @@
+"use client"
+
 import Link from 'next/link'
+import GoogleLoginButton from "@/components/GoogleLoginButton"
 
 export default function HomePage() {
   return (
@@ -6,9 +9,12 @@ export default function HomePage() {
       {/* Navbar */}
       <header className="flex justify-between items-center px-8 py-6 max-w-7xl w-full mx-auto">
         <h1 className="text-xl font-bold">MyApp</h1>
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
           <Link href="/login" className="px-5 py-2 rounded-lg hover:bg-white/10 transition">Login</Link>
           <Link href="/register" className="px-5 py-2 bg-blue-600 rounded-lg hover:bg-blue-700 transition">Register</Link>
+          <div className="hidden sm:block">
+            <GoogleLoginButton />
+          </div>
         </div>
       </header>
 

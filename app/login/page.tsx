@@ -1,8 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { login } from "@/lib/auth"
+import { googleLogin, login } from "@/lib/auth"
 import { useRouter } from "next/navigation"
+import { GoogleLogin } from "@react-oauth/google"
+import GoogleLoginButton from "@/components/GoogleLoginButton"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -48,6 +50,17 @@ export default function LoginPage() {
           >
             {loading ? "Signing in..." : "Login"}
           </button>
+        </div>
+        <div className="mt-4">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-sm text-slate-400">or continue with</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
+          <div className="mt-4 flex justify-center">
+            <GoogleLoginButton />
+          </div>
         </div>
       </div>
     </div>
