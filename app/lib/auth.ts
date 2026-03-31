@@ -42,3 +42,14 @@ export async function refreshToken() {
     throw new Error("Session expired")
   }
 }
+
+export async function googleLogin(token: string) {
+  const res = await apiFetch("/auth/google/login", {
+    method: "POST",
+    body: JSON.stringify({ token }),
+  })
+
+  if (!res.ok) throw new Error("Google login failed")
+
+  return res.json()
+}
