@@ -62,27 +62,27 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-slate-900" />
+      <div className="flex flex-1 items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
       </div>
     )
   }
 
   if (!isSuperAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-100">
-        <div className="bg-white p-10 rounded-2xl shadow-md border border-slate-200 text-center max-w-sm">
+      <div className="flex flex-1 items-center justify-center p-6">
+        <div className="bg-white/5 border border-white/10 p-10 rounded-2xl text-center max-w-sm">
           <div className="text-5xl mb-4">🔒</div>
-          <h1 className="text-xl font-bold text-slate-900 mb-2">Access Denied</h1>
-          <p className="text-slate-500 text-sm mb-6">
-            You need the <span className="font-semibold text-purple-600">super_admin</span> role to
+          <h1 className="text-xl font-bold text-white mb-2">Access Denied</h1>
+          <p className="text-slate-400 text-sm mb-6">
+            You need the <span className="font-semibold text-purple-400">super_admin</span> role to
             access this page.
           </p>
           <button
             onClick={() => router.push("/dashboard")}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm"
+            className="px-4 py-2 bg-white/10 hover:bg-white/15 border border-white/10 text-white rounded-lg text-sm transition"
           >
-            Back to Dashboard
+            ← Back to Dashboard
           </button>
         </div>
       </div>
@@ -137,61 +137,59 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 p-6">
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900">Admin Panel</h1>
-            <p className="text-slate-500 text-sm mt-1">Manage users, roles, and permissions</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">
-              super_admin
-            </span>
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="px-3 py-1.5 text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg"
-            >
-              ← Dashboard
-            </button>
-          </div>
+    <div className="relative flex-1 max-w-5xl w-full mx-auto px-6 py-10 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Admin Panel</h1>
+          <p className="text-slate-400 text-sm mt-1">Manage users, roles, and permissions</p>
         </div>
+        <div className="flex items-center gap-3">
+          <span className="px-2.5 py-1 bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-semibold rounded-full">
+            super_admin
+          </span>
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white hover:bg-white/8 border border-white/10 rounded-lg transition"
+          >
+            ← Dashboard
+          </button>
+        </div>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit shadow-sm">
-          {(["users", "access-control"] as Tab[]).map((t) => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                tab === t
-                  ? "bg-indigo-600 text-white shadow-sm"
-                  : "text-slate-600 hover:bg-slate-100"
-              }`}
-            >
-              {t === "users" ? "Users" : "Access Control"}
-            </button>
-          ))}
-        </div>
+      {/* Tabs */}
+      <div className="flex gap-1 bg-white/5 border border-white/8 rounded-xl p-1 w-fit">
+        {(["users", "access-control"] as Tab[]).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              tab === t
+                ? "bg-indigo-600 text-white shadow-sm"
+                : "text-slate-400 hover:text-white hover:bg-white/8"
+            }`}
+          >
+            {t === "users" ? "Users" : "Access Control"}
+          </button>
+        ))}
+      </div>
 
-        {/* Tab content */}
-        <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
-          {tab === "users" ? (
-            <UsersList
-              users={users}
-              roles={roles}
-              onUpdateUserRoles={handleUpdateUserRoles}
-            />
-          ) : (
-            <AccessControl
-              roles={roles}
-              onAddRole={handleAddRole}
-              onRenameRole={handleRenameRole}
-              onDeleteRole={handleDeleteRole}
-            />
-          )}
-        </div>
+      {/* Tab content */}
+      <div className="bg-white/5 border border-white/8 rounded-2xl p-6">
+        {tab === "users" ? (
+          <UsersList
+            users={users}
+            roles={roles}
+            onUpdateUserRoles={handleUpdateUserRoles}
+          />
+        ) : (
+          <AccessControl
+            roles={roles}
+            onAddRole={handleAddRole}
+            onRenameRole={handleRenameRole}
+            onDeleteRole={handleDeleteRole}
+          />
+        )}
       </div>
     </div>
   )

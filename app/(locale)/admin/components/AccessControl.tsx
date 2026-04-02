@@ -129,19 +129,19 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-slate-800 mb-4">Access Control</h2>
+      <h2 className="text-lg font-semibold text-white mb-4">Access Control</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Roles panel */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-slate-600 uppercase mb-3">Roles</h3>
+        <div className="bg-white/5 border border-white/8 rounded-xl p-4">
+          <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Roles</h3>
           <ul className="space-y-1 mb-4">
             {roles.map((role) => (
               <li
                 key={role.id}
                 className={`flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer transition-colors ${
                   selectedRole?.id === role.id
-                    ? "bg-indigo-50 border border-indigo-200"
-                    : "hover:bg-slate-50 border border-transparent"
+                    ? "bg-indigo-500/15 border border-indigo-500/30"
+                    : "hover:bg-white/5 border border-transparent"
                 }`}
                 onClick={() => {
                   if (editingRoleId !== role.id) setSelectedRole(role)
@@ -158,12 +158,12 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
                     }}
                     onBlur={() => handleRenameRole(role.id)}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex-1 text-sm border border-indigo-300 rounded px-2 py-0.5 focus:outline-none"
+                    className="flex-1 text-sm bg-white/10 border border-indigo-500/40 rounded px-2 py-0.5 text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   />
                 ) : (
                   <span
                     className={`flex-1 text-sm font-medium truncate ${
-                      selectedRole?.id === role.id ? "text-indigo-700" : "text-slate-700"
+                      selectedRole?.id === role.id ? "text-indigo-300" : "text-slate-300"
                     }`}
                     onDoubleClick={(e) => {
                       if (role.name === "super_admin") return
@@ -182,7 +182,7 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
                       e.stopPropagation()
                       handleDeleteRole(role.id, role.name)
                     }}
-                    className="text-slate-400 hover:text-red-500 text-xs ml-2 shrink-0"
+                    className="text-slate-500 hover:text-red-400 text-xs ml-2 shrink-0 transition-colors"
                     title="Delete role"
                   >
                     ✕
@@ -198,12 +198,12 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
               value={newRoleName}
               onChange={(e) => setNewRoleName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAddRole()}
-              className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+              className="flex-1 text-sm bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition"
             />
             <button
               onClick={handleAddRole}
               disabled={submittingRole}
-              className="px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-lg"
+              className="px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-lg transition"
             >
               {submittingRole ? "…" : "Add"}
             </button>
@@ -211,22 +211,22 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
         </div>
 
         {/* Permissions panel */}
-        <div className="md:col-span-2 bg-white border border-slate-200 rounded-xl p-4">
+        <div className="md:col-span-2 bg-white/5 border border-white/8 rounded-xl p-4">
           {selectedRole ? (
             <>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-slate-600 uppercase">
+                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   Permissions —{" "}
-                  <span className="text-indigo-600">{selectedRole.name}</span>
+                  <span className="text-indigo-400 normal-case">{selectedRole.name}</span>
                 </h3>
                 <div className="flex items-center gap-2">
                   {isDirty && (
-                    <span className="text-xs text-amber-500">Unsaved changes</span>
+                    <span className="text-xs text-amber-400">Unsaved changes</span>
                   )}
                   <button
                     onClick={handleSave}
                     disabled={saving || !isDirty}
-                    className="px-3 py-1 text-xs bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white rounded-lg"
+                    className="px-3 py-1 text-xs bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white rounded-lg transition"
                   >
                     {saving ? "Saving…" : "Save"}
                   </button>
@@ -235,12 +235,12 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
 
               {loadingPerms ? (
                 <div className="flex items-center justify-center h-24">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600" />
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500" />
                 </div>
               ) : (
                 <>
                   {permissions.length === 0 ? (
-                    <p className="text-slate-400 text-sm mb-4">No permissions defined for this role.</p>
+                    <p className="text-slate-500 text-sm mb-4">No permissions defined for this role.</p>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
                       {permissions.map((perm) => {
@@ -250,19 +250,17 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
                             key={perm.id}
                             className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                               assigned
-                                ? "bg-indigo-50 border-indigo-200"
-                                : "bg-slate-50 border-slate-200 hover:bg-slate-100"
+                                ? "bg-indigo-500/15 border-indigo-500/30"
+                                : "bg-white/3 border-white/8 hover:bg-white/6"
                             }`}
                           >
                             <input
                               type="checkbox"
                               checked={assigned}
                               onChange={() => togglePerm(perm.name)}
-                              className="mt-0.5 rounded border-slate-300 text-indigo-600"
+                              className="mt-0.5 rounded border-white/20 bg-white/10 text-indigo-500"
                             />
-                            <div>
-                              <p className="text-sm font-medium text-slate-800">{perm.name}</p>
-                            </div>
+                            <p className="text-sm font-medium text-slate-200">{perm.name}</p>
                           </label>
                         )
                       })}
@@ -281,17 +279,17 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
                           if (e.key === "Enter") handleAddCustomPerm()
                           if (e.key === "Escape") { setAddingPerm(false); setNewPermName("") }
                         }}
-                        className="flex-1 text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                        className="flex-1 text-sm bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition"
                       />
                       <button
                         onClick={handleAddCustomPerm}
-                        className="px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg"
+                        className="px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition"
                       >
                         Add
                       </button>
                       <button
                         onClick={() => { setAddingPerm(false); setNewPermName("") }}
-                        className="px-3 py-1.5 text-sm bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg"
+                        className="px-3 py-1.5 text-sm bg-white/8 hover:bg-white/12 border border-white/10 text-slate-300 rounded-lg transition"
                       >
                         Cancel
                       </button>
@@ -299,7 +297,7 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
                   ) : (
                     <button
                       onClick={() => setAddingPerm(true)}
-                      className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                      className="text-sm text-indigo-400 hover:text-indigo-300 font-medium transition"
                     >
                       + Add permission
                     </button>
@@ -308,7 +306,7 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
               )}
             </>
           ) : (
-            <p className="text-slate-400 text-sm">Select a role to manage permissions</p>
+            <p className="text-slate-500 text-sm">Select a role to manage permissions</p>
           )}
         </div>
       </div>

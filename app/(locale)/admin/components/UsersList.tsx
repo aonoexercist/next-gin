@@ -32,10 +32,10 @@ export default function UsersList({ users, roles, onUpdateUserRoles }: Props) {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold text-slate-800 mb-4">Users</h2>
-      <div className="overflow-x-auto rounded-xl border border-slate-200">
+      <h2 className="text-lg font-semibold text-white mb-4">Users</h2>
+      <div className="overflow-x-auto rounded-xl border border-white/8">
         <table className="w-full text-sm text-left">
-          <thead className="bg-slate-50 text-slate-500 uppercase text-xs">
+          <thead className="bg-white/5 text-slate-400 uppercase text-xs">
             <tr>
               <th className="px-4 py-3">Name</th>
               <th className="px-4 py-3">Email</th>
@@ -43,23 +43,23 @@ export default function UsersList({ users, roles, onUpdateUserRoles }: Props) {
               <th className="px-4 py-3 text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-white/5">
             {users.map((user) => (
-              <tr key={user.id} className="bg-white hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium text-slate-800">{user.name}</td>
-                <td className="px-4 py-3 text-slate-600">{user.email}</td>
+              <tr key={user.id} className="hover:bg-white/3 transition-colors">
+                <td className="px-4 py-3 font-medium text-white">{user.name}</td>
+                <td className="px-4 py-3 text-slate-400">{user.email}</td>
                 <td className="px-4 py-3">
                   {editingUserId === user.id ? (
                     <div className="flex flex-wrap gap-2">
                       {roles.map((role) => (
-                        <label key={role.id} className="flex items-center gap-1 cursor-pointer">
+                        <label key={role.id} className="flex items-center gap-1.5 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={selectedRoles.includes(role.name)}
                             onChange={() => toggleRole(role.name)}
-                            className="rounded border-slate-300 text-indigo-600"
+                            className="rounded border-white/20 bg-white/10 text-indigo-500"
                           />
-                          <span className="text-slate-700">{role.name}</span>
+                          <span className="text-slate-300 text-xs">{role.name}</span>
                         </label>
                       ))}
                     </div>
@@ -71,19 +71,19 @@ export default function UsersList({ users, roles, onUpdateUserRoles }: Props) {
                             key={r}
                             className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                               r === "super_admin"
-                                ? "bg-purple-100 text-purple-700"
+                                ? "bg-purple-500/15 border border-purple-500/30 text-purple-300"
                                 : r === "admin"
-                                ? "bg-blue-100 text-blue-700"
+                                ? "bg-blue-500/15 border border-blue-500/30 text-blue-300"
                                 : r === "editor"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-slate-100 text-slate-600"
+                                ? "bg-green-500/15 border border-green-500/30 text-green-300"
+                                : "bg-white/8 border border-white/10 text-slate-300"
                             }`}
                           >
                             {r}
                           </span>
                         ))
                       ) : (
-                        <span className="text-slate-400 italic">No roles</span>
+                        <span className="text-slate-500 italic text-xs">No roles</span>
                       )}
                     </div>
                   )}
@@ -93,13 +93,13 @@ export default function UsersList({ users, roles, onUpdateUserRoles }: Props) {
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => saveRoles(user.id)}
-                        className="px-3 py-1 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-md"
+                        className="px-3 py-1 text-xs bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition"
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setEditingUserId(null)}
-                        className="px-3 py-1 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-md"
+                        className="px-3 py-1 text-xs bg-white/8 hover:bg-white/12 border border-white/10 text-slate-300 rounded-lg transition"
                       >
                         Cancel
                       </button>
@@ -107,7 +107,7 @@ export default function UsersList({ users, roles, onUpdateUserRoles }: Props) {
                   ) : (
                     <button
                       onClick={() => openEdit(user)}
-                      className="px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md"
+                      className="px-3 py-1 text-xs bg-white/8 hover:bg-white/12 border border-white/10 text-slate-300 rounded-lg transition"
                     >
                       Edit Roles
                     </button>
