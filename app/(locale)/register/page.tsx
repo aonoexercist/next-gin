@@ -34,7 +34,7 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-6">
+      <div className="flex flex-1 items-center justify-center p-6">
         <div className="text-center max-w-sm">
           <div className="w-16 h-16 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-5">
             <svg className="w-7 h-7 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -55,18 +55,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 flex flex-col">
-      {/* Ambient blobs */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-125 h-125 rounded-full bg-indigo-600/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-125 h-125 rounded-full bg-blue-600/10 blur-3xl" />
-      </div>
-
+    <div className="flex flex-col flex-1">
       {/* Header */}
       <header className="relative flex items-center justify-between px-8 py-5 border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 group">
-          <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow-lg group-hover:bg-blue-500 transition">M</span>
-          <span className="text-lg font-bold text-white tracking-tight">MyApp</span>
+          <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-xs text-white shadow-lg group-hover:bg-blue-500 transition">NG</span>
+          <span className="text-lg font-bold text-white tracking-tight">NextGin</span>
         </Link>
         <span className="text-sm text-slate-400">
           Already have an account?{" "}
