@@ -44,7 +44,15 @@ export default function Dashboard() {
               <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
               <p className="text-slate-600 mt-2">Welcome back, {user?.email}</p>
             </div>
-            <div>
+            <div className="flex items-center gap-2">
+              {user?.roles?.some((r) => r.name === "super_admin") && (
+                <button
+                  onClick={() => router.push("/admin")}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm"
+                >
+                  Admin
+                </button>
+              )}
               <button
                 onClick={handleLogout}
                 className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md"
