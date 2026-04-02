@@ -11,7 +11,7 @@ const NO_ONE_TAP_PATHS = ["/login", "/register"]
 
 export default function GoogleProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const showOneTap = !NO_ONE_TAP_PATHS.includes(pathname)
+  const showOneTap = NO_ONE_TAP_PATHS.includes(pathname)
 
   return (
     <GoogleOAuthProvider clientId={clientId}>
