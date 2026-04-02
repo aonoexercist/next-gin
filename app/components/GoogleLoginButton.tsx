@@ -9,6 +9,7 @@ export default function GoogleLoginButton() {
 
   return (
     <GoogleLogin
+      useOneTap={true}
       onSuccess={async (credentialResponse) => {
         const idToken = credentialResponse?.credential
         if (!idToken) return
