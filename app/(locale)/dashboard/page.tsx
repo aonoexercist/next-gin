@@ -4,7 +4,7 @@ import React, { useEffect } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import { logout } from "@/lib/auth"
-import Todos from "./Todos"
+import Todos from "./components/Todos"
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
