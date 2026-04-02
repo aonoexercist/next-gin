@@ -24,7 +24,7 @@ export async function apiFetch(
   // Clone to check if it's a refreshable error without consuming the stream
   const data = await res.clone().json().catch(() => ({}));
 
-  if (data.error !== "missing_token") {
+  if (data.error !== "missing_token" && data.error !== "token_expired") {
     return res; 
   }
 
