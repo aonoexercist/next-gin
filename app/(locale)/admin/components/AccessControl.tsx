@@ -43,7 +43,7 @@ export default function AccessControl({ roles, onAddRole, onRenameRole, onDelete
         setPendingPerms([])
       })
       .finally(() => setLoadingPerms(false))
-  }, [selectedRole?.id])
+  }, [selectedRole])
 
   // Auto-select first role when list populates initially
   useEffect(() => {
