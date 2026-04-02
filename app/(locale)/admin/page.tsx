@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation"
 import { AdminRole, AdminUser } from "@/models/User"
 import { useUsersStore } from "@/hooks/useUsersStore"
 import { updateUserRole } from "@/lib/adminApi"
-import UsersList from "./UsersList"
-import AccessControl from "./AccessControl"
+import UsersList from "./components/UsersList"
+import AccessControl from "./components/AccessControl"
 
 type Tab = "users" | "access-control"
 
