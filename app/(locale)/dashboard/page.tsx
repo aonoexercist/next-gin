@@ -1,78 +1,40 @@
 "use client"
 
-import React, { useEffect } from "react"
+import { useEffect } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
-import { logout } from "@/lib/auth"
 import Todos from "./components/Todos"
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
   const router = useRouter()
 
-  const handleLogout = async () => {
-    try {
-      confirm("Are you sure you want to logout?") && await logout();
-    } catch (err) {
-      // swallow errors and continue to redirect
-      console.error("Logout failed", err)
-    } finally {
-      router.push("/login")
-    }
-  }
-
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login")
     }
-  }, [user, loading])
+  }, [user, loading, router])
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-slate-900" />
+      <div className="flex flex-1 items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
       </div>
     )
   }
 
-  return (
-    <div className="min-h-screen bg-slate-100 p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
-              <p className="text-slate-600 mt-2">Welcome back, {user?.email}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              {user?.roles?.some((r) => r.name === "super_admin") && (
-                <button
-                  onClick={() => router.push("/admin")}
-                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm"
-                >
-                  Admin
-                </button>
-              )}
-              <button
-                onClick={handleLogout}
-                className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-md"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
+  const displayName = user?.name || user?.email || "User"
 
-        <div className="mt-6">
-          {/* Todos component */}
-          {/* eslint-disable-next-line @next/next/no-component-definition */}
-          {/* Lazy import client component to avoid SSR issues */}
-          <React.Suspense fallback={<div>Loading todos…</div>}>
-            {/* @ts-ignore */}
-            <Todos />
-          </React.Suspense>
-        </div>
+  return (
+    <main className="relative flex-1 max-w-3xl w-full mx-auto px-6 py-10">
+      {/* Welcome */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-white tracking-tight">Dashboard</h1>
+        <p className="mt-1 text-sm text-slate-400">Welcome back, <span className="text-slate-200">{displayName}</span>.</p>
       </div>
-    </div>
+
+      {/* Todos */}
+      <Todos />
+    </main>
   )
 }
