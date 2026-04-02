@@ -4,7 +4,7 @@ let isRefreshing = false;
 
 type PendingRequest = {
   resolve: (res: Response) => void;
-  reject: (err: any) => void;
+  reject: (err: unknown) => void;
   url: string;
   options: RequestInit;
 };
