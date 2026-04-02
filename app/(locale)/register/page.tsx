@@ -1,12 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { register } from "@/lib/auth"
 
 export default function RegisterPage() {
-  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
@@ -26,6 +24,7 @@ export default function RegisterPage() {
       await register(`${firstName} ${lastName}`.trim(), email, password)
       setSuccess(true)
     } catch (err) {
+      console.error("Registration error:", err)
       setError("Registration failed. The email may already be in use.")
     } finally {
       setLoading(false)
