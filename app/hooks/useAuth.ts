@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react"
 import { getMe } from "@/lib/auth"
+import { User } from "@/models/User"
 
 export function useAuth() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
