@@ -1,19 +1,26 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { create } from "zustand"
 import { getMe } from "@/lib/auth"
 import { User } from "@/models/User"
 
-export function useAuth() {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+type AuthState = {
+  user: User | null
+  loading: boolean
+  fetch: () => Promise<void>
+  setUser: (user: User | null) => void
+}
 
-  useEffect(() => {
-    getMe().then((data) => {
-      setUser(data)
-      setLoading(false)
-    })
-  }, [])
+export const useAuth = create<AuthState>((set) => ({
+  user: null,
+  loading: true,
+  fetch: async () => {
+    const data = await getMe()
+    set({ user: data, loading: false })
+  },
+  setUser: (user) => set({ user }),
+}))
 
-  return { user, loading }
+if (typeof window !== "undefined") {
+  useAuth.getState().fetch()
 }
