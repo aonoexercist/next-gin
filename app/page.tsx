@@ -17,7 +17,7 @@ export default function HomePage() {
       <header className="relative flex justify-between items-center px-8 py-5 max-w-7xl w-full mx-auto border-b border-white/5">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-sm shadow-lg group-hover:bg-blue-500 transition">M</span>
-          <span className="text-lg font-bold tracking-tight">MyApp</span>
+          <span className="text-lg font-bold tracking-tight">NextGin</span>
         </Link>
         <nav className="flex gap-2 items-center">
           <Link
@@ -92,7 +92,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="relative border-t border-white/5 py-6 text-center text-xs text-slate-600">
-        © {new Date().getFullYear()} MyApp. All rights reserved.
+        © {new Date().getFullYear()} NextGin. All rights reserved.
       </footer>
     </main>
   )
