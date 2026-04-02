@@ -22,7 +22,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     loadUsers()
-  }, [])
+  }, [loadUsers])
 
   useEffect(() => {
     setUsers(
