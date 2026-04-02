@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import { AdminRole, AdminUser } from "@/models/User"
@@ -15,41 +15,36 @@ export default function AdminPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
 
-  const { users: rawUsers, roles: rawRoles, load: loadUsers } = useUsersStore()
+  const { users: rawUsers, roles: rawRoles, load: loadUsers, setUsers: setRawUsers, setRoles: setRawRoles } = useUsersStore()
   const [tab, setTab] = useState<Tab>("users")
-  const [users, setUsers] = useState<AdminUser[]>([])
-  const [roles, setRoles] = useState<AdminRole[]>([])
 
   useEffect(() => {
     loadUsers()
   }, [loadUsers])
 
-  useEffect(() => {
-    setUsers(
+  const users = useMemo<AdminUser[]>(
+    () =>
       rawUsers.map((u) => ({
-        id: (u as any).id ?? u.email,
+        id: u.id ?? u.email,
         name: u.name,
         email: u.email,
         roles: u.roles.map((r) => r.name),
-      }))
-    )
-  }, [rawUsers])
+      })),
+    [rawUsers]
+  )
 
-  useEffect(() => {
-    // Build permissions map from user role data (User.roles carry permissions[])
+  const roles = useMemo<AdminRole[]>(() => {
     const permMap = new Map<string, string[]>()
     rawUsers.forEach((u) => {
       u.roles.forEach((r) => {
         if (!permMap.has(r.name)) permMap.set(r.name, r.permissions)
       })
     })
-    setRoles(
-      rawRoles.map((r) => ({
-        id: String(r.id),
-        name: r.name,
-        permissions: permMap.get(r.name) ?? [],
-      }))
-    )
+    return rawRoles.map((r) => ({
+      id: String(r.id),
+      name: r.name,
+      permissions: permMap.get(r.name) ?? [],
+    }))
   }, [rawRoles, rawUsers])
 
   const isSuperAdmin = user?.roles?.some((r) => r.name === "super_admin") ?? false
@@ -92,45 +87,48 @@ export default function AdminPage() {
   // --- Handlers ---
 
   const handleUpdateUserRoles = async (userId: string, newRoles: string[]) => {
-    const prevRoles = users.find((u) => u.id === userId)?.roles ?? []
-    setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, roles: newRoles } : u))
+    const prevRawUsers = rawUsers
+    setRawUsers(
+      rawUsers.map((u) => {
+        if ((u.id ?? u.email) !== userId) return u
+        return {
+          ...u,
+          roles: newRoles.map((name) => u.roles.find((r) => r.name === name) ?? { name, permissions: [] }),
+        }
+      })
     )
     try {
       await updateUserRole(userId, newRoles)
     } catch (err) {
       console.error("Failed to update user roles", err)
-      setUsers((prev) =>
-        prev.map((u) => (u.id === userId ? { ...u, roles: prevRoles } : u))
-      )
+      setRawUsers(prevRawUsers)
     }
   }
 
   const handleAddRole = (role: { id: string; name: string }) => {
-    setRoles((prev) => [...prev, { id: role.id, name: role.name, permissions: [] }])
+    setRawRoles([...rawRoles, { id: Number(role.id), name: role.name }])
   }
 
   const handleRenameRole = (roleId: string, newName: string) => {
-    const oldName = roles.find((r) => r.id === roleId)?.name
-    setRoles((prev) => prev.map((r) => (r.id === roleId ? { ...r, name: newName } : r)))
-    if (oldName) {
-      setUsers((prev) =>
-        prev.map((u) => ({
-          ...u,
-          roles: u.roles.map((r) => (r === oldName ? newName : r)),
-        }))
-      )
-    }
+    const oldRole = rawRoles.find((r) => String(r.id) === roleId)
+    if (!oldRole) return
+    setRawRoles(rawRoles.map((r) => (String(r.id) === roleId ? { ...r, name: newName } : r)))
+    setRawUsers(
+      rawUsers.map((u) => ({
+        ...u,
+        roles: u.roles.map((r) => (r.name === oldRole.name ? { ...r, name: newName } : r)),
+      }))
+    )
   }
 
   const handleDeleteRole = (roleId: string) => {
-    const deletedRole = roles.find((r) => r.id === roleId)
-    setRoles((prev) => prev.filter((r) => r.id !== roleId))
+    const deletedRole = rawRoles.find((r) => String(r.id) === roleId)
+    setRawRoles(rawRoles.filter((r) => String(r.id) !== roleId))
     if (deletedRole) {
-      setUsers((prev) =>
-        prev.map((u) => ({
+      setRawUsers(
+        rawUsers.map((u) => ({
           ...u,
-          roles: u.roles.filter((r) => r !== deletedRole.name),
+          roles: u.roles.filter((r) => r.name !== deletedRole.name),
         }))
       )
     }
