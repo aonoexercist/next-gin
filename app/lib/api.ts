@@ -1,14 +1,25 @@
+import { logout } from "./auth";
+
 let isRefreshing = false;
-let pendingRequests: ((res: Response) => void)[] = [];
+
+type PendingRequest = {
+  resolve: (res: Response) => void;
+  reject: (err: any) => void;
+  url: string;
+  options: RequestInit;
+};
+
+let pendingRequests: PendingRequest[] = [];
 
 export async function apiFetch(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<Response> {
   const url = `/api${endpoint}`;
-  const fetchOptions = {
+
+  const fetchOptions: RequestInit = {
     ...options,
-    credentials: "include" as const,
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
       ...(options.headers || {}),
@@ -21,23 +32,22 @@ export async function apiFetch(
     return res;
   }
 
-  // Clone to check if it's a refreshable error without consuming the stream
   const data = await res.clone().json().catch(() => ({}));
 
   if (data.error !== "missing_token" && data.error !== "token_expired") {
-    return res; 
+    return res;
   }
 
-  // --- REFRESH LOGIC ---
-  
-  // 1. Create a promise that will resolve once the refresh is done
-  const retryPromise = new Promise<Response>((resolve) => {
-    pendingRequests.push((res: Response) => {
-      resolve(res);
+  // 🔹 Create retry promise for THIS specific request
+  const retryPromise = new Promise<Response>((resolve, reject) => {
+    pendingRequests.push({
+      resolve,
+      reject,
+      url,
+      options: fetchOptions,
     });
   });
 
-  // 2. Only one request starts the refresh process
   if (!isRefreshing) {
     isRefreshing = true;
 
@@ -47,24 +57,36 @@ export async function apiFetch(
         credentials: "include",
       });
 
-      if (refreshRes.ok) {
-        isRefreshing = false;
-        // 3. Execute all queued retries
-        const queue = [...pendingRequests];
-        pendingRequests = []; // Clear queue before running to avoid loops
-        const retryRes = await fetch(url, fetchOptions);
-        queue.forEach((callback) => callback(retryRes));
-      } else {
+      if (!refreshRes.ok) {
+        await logout();
         throw new Error("Refresh failed");
       }
+
+      // ✅ Refresh success → retry ALL requests individually
+      const queue = [...pendingRequests];
+      pendingRequests = [];
+      isRefreshing = false;
+
+      await Promise.all(
+        queue.map(async (req) => {
+          try {
+            const retryRes = await fetch(req.url, req.options);
+            req.resolve(retryRes);
+          } catch (err) {
+            req.reject(err);
+          }
+        })
+      );
     } catch (err) {
       isRefreshing = false;
+
+      // ❌ Reject all pending requests
+      pendingRequests.forEach((req) => req.reject(err));
       pendingRequests = [];
-      // window.location.href = "/login"; // Or your logout logic
-      throw err;
+
+      await logout();
     }
   }
 
-  // 4. All 401 requests (the first one AND simultaneous ones) wait here
   return retryPromise;
 }
