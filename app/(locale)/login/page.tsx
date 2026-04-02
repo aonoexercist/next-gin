@@ -33,18 +33,11 @@ export default function LoginPage() {
 
   return (
     <GoogleProvider>
-        <div className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 flex flex-col">
-        {/* Ambient blobs */}
-        <div className="pointer-events-none fixed inset-0 overflow-hidden">
-          <div className="absolute -top-40 -left-40 w-125 h-125 rounded-full bg-blue-600/10 blur-3xl" />
-          <div className="absolute -bottom-40 -right-40 w-125 h-125 rounded-full bg-indigo-600/10 blur-3xl" />
-        </div>
-
-        {/* Header */}
+      <div className="flex flex-col flex-1">
         <header className="relative flex items-center justify-between px-8 py-5 border-b border-white/5">
           <Link href="/" className="flex items-center gap-2 group">
-            <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-sm text-white shadow-lg group-hover:bg-blue-500 transition">M</span>
-            <span className="text-lg font-bold text-white tracking-tight">MyApp</span>
+            <span className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center font-bold text-xs text-white shadow-lg group-hover:bg-blue-500 transition">NG</span>
+            <span className="text-lg font-bold text-white tracking-tight">NextGin</span>
           </Link>
           <span className="text-sm text-slate-400">
             No account?{" "}
