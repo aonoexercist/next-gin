@@ -1,81 +1,99 @@
 # next-gin
 
-A Next.js application using the App Router with a small dashboard and auth hooks. This repository contains the frontend app (Next.js) and client-side helpers for authentication and API access.
+Next.js 16 frontend for a Go Gin backend. Features email/password auth, Google OAuth, a user dashboard, and an admin panel. All API calls are proxied server-side through a Next.js route handler so credentials never leave the server.
+
+## Tech Stack
+
+- **Next.js 16** — App Router, TypeScript, standalone output
+- **React 19** with Zustand for state management
+- **Tailwind CSS v4**
+- **Google OAuth** via `@react-oauth/google`
+- **Bun** — package manager and production runtime
+- **Vitest** + React Testing Library — unit/integration tests
+- **Husky** + lint-staged — pre-commit hooks
 
 ## Features
 
-- App Router based Next.js app (app/)
-- Simple dashboard pages under `dashboard/`
-- Client-side auth hooks in `hooks/` and auth helpers in `lib/`
-- Example API route using Next.js route handlers in `app/api/`
+- Email/password login and registration
+- Google OAuth sign-in
+- Protected dashboard with Todos
+- Admin panel — user list and role/permission management (requires `super_admin` role)
+- Middleware-based route protection (`proxy.ts` / `middleware.ts`)
+- API proxy at `app/api/[...path]/route.ts` — forwards all requests to the backend, forwarding cookies
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+# Backend API base URL (server-side only)
+API_URL=http://localhost:8080
+
+# Google OAuth client ID (exposed to the browser)
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-client-id
+```
 
 ## Prerequisites
 
-- Node.js 18 or newer
-- npm (or pnpm / yarn)
+- [Bun](https://bun.sh/) 1.2+
 
 ## Install
 
-Install dependencies:
-
 ```bash
-npm install
+bun install
 ```
 
 ## Development
 
-Run the development server:
-
 ```bash
-npm run dev
+bun run dev
 ```
 
-Open http://localhost:3000 to view the app.
+Open http://localhost:3000.
 
 ## Build & Start
 
-Build the production bundle:
-
 ```bash
-npm run build
+bun run build
+bun run start
 ```
 
-Start the production server:
+## Tests
 
 ```bash
-npm run start
+bun run test
 ```
 
-## Linting
-
-Run the linter:
+## Lint
 
 ```bash
-npm run lint
+bun run lint
 ```
 
-## Project layout
+## Docker
 
-- `app/` — Next.js App Router pages and API route handlers
-	- `app/page.tsx` — main landing page
-	- `app/api/[...path]/route.ts` — example API route
-- `dashboard/` — dashboard UI and components
-- `hooks/` — React hooks (e.g., `useAuth.ts`)
-- `lib/` — helper libraries (e.g., `api.ts`, `auth.ts`)
-- `public/` — static assets
+Build and run with Docker Compose (reads `.env` automatically):
 
-## Notes
+```bash
+docker compose up --build
+```
 
-- This project uses Next.js 16+ and the App Router. Adjust Node version if you see compatibility warnings.
-- If you plan to deploy to Vercel, the default configuration should work; review `next.config.ts` for any custom settings.
+The container runs on port **3000**. The multi-stage `Dockerfile` produces a minimal standalone image using `bun run build` → `bun server.js`.
 
-## Want me to do more?
+## Project Layout
 
-If you'd like I can:
-
-- Add a Getting Started section with environment variables
-- Add CI config (GitHub Actions) for lint/build
-- Commit these README changes
-
----
-Updated README to add project overview, setup commands, and structure.
+```
+app/
+  (locale)/
+    admin/          — Admin panel (users & access control)
+    dashboard/      — Authenticated user dashboard (todos)
+    login/          — Login page
+    register/       — Registration page
+  api/[...path]/    — API proxy route handler
+  components/       — Shared UI components (NavBar, GoogleLoginButton)
+  hooks/            — React hooks (useAuth, useTodosStore, useUsersStore)
+  lib/              — API helpers (api.ts, auth.ts, adminApi.ts)
+  models/           — TypeScript types (User)
+  providers/        — Context providers (GoogleProvider)
+proxy.ts            — Next.js middleware for route protection
+```
