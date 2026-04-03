@@ -34,7 +34,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: ghcr.io/${{ github.repository }}/next-gin-frontend
+      IMAGE_NAME: ghcr.io/${{ github.actor }}/next-gin-frontend
 
     permissions:
       contents: read
