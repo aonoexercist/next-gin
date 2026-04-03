@@ -34,7 +34,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: ghcr.io/${{ github.repository }}/frontend
+      IMAGE_NAME: ghcr.io/${{ github.repository }}/next-gin-frontend
 
     permissions:
       contents: read
@@ -79,8 +79,9 @@ jobs:
       
     - name: Delete old untagged images
       uses: actions/delete-package-versions@v5
+      continue-on-error: true
       with:
-        package-name: 'edusync-frontend'
+        package-name: 'next-gin-frontend'
         package-type: 'container'
         # Keeps the 3 most recent tagged versions just in case
         min-versions-to-keep: 3
