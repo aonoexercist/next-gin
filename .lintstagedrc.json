@@ -1,0 +1,7 @@
+{
+  "*.{js,ts,tsx}": [
+    "echo LINTING FILE...",
+    "bunx eslint --fix",
+    "bunx tsc --noEmit"
+  ]
+}
