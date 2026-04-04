@@ -1,0 +1,9 @@
+services:
+  frontend:
+    image: ghcr.io/aonoexercist/next-gin-frontend:latest
+    container_name: next-gin-app
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    restart: always
