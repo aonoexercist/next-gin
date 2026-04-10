@@ -11,6 +11,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Set environment variables for build time
+ARG API_URL
+ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
+ENV API_URL=$API_URL
+ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
+
 ENV NEXT_TELEMETRY_DISABLED=1
 # This creates the .next/standalone folder
 RUN bun run build
