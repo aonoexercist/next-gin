@@ -6,8 +6,7 @@ services:
       args:
         # This maps the .env value to the Docker build process
         - API_URL=${API_URL}
-        - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}
-        - BUILD_VERSION=${BUILD_VERSION}
+        - NEXT_PUBLIC_GOOGLE_CLIENT_ID=${NEXT_PUBLIC_GOOGLE_CLIENT_ID}\
     image: next-gin:latest
     container_name: next-gin-app
     ports:
