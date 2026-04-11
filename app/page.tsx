@@ -9,9 +9,9 @@ export default function HomePage() {
     <main className="min-h-screen bg-linear-to-br from-slate-950 via-slate-900 to-slate-950 text-white flex flex-col">
       {/* Ambient blobs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-indigo-600/10 blur-3xl" />
-      </div>
+        <div className="absolute -top-40 -left-40 w-150 h-150 rounded-full bg-blue-600/10 blur-3xl" />
+        <div className="absolute -bottom-40 -right-40 w-150 h-150 rounded-full bg-indigo-600/10 blur-3xl" />
+      </div>``
 
       {/* Navbar */}
       <header className="relative flex justify-between items-center px-8 py-5 max-w-7xl w-full mx-auto border-b border-white/5">
@@ -45,7 +45,7 @@ export default function HomePage() {
         <h2 className="max-w-3xl text-5xl md:text-6xl font-extrabold leading-tight tracking-tight">
           Build fast apps,
           <br />
-          <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">ship with confidence.</span>
+          <span className="bg-linear-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">ship with confidence.</span>
         </h2>
 
         <p className="mt-6 max-w-xl text-base text-slate-400 leading-relaxed">
