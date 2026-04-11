@@ -1,4 +1,5 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { execSync } from 'child_process';
+import { writeFileSync } from 'fs';
 import { join } from 'path';
 
 const versionFile = join(process.cwd(), '.build-version');
@@ -9,17 +10,11 @@ const month = String(now.getMonth() + 1).padStart(2, '0');
 const day = String(now.getDate()).padStart(2, '0');
 const today = `${year}${month}${day}`;
 
-let buildNumber = 1;
-
-try {
-  const content = readFileSync(versionFile, 'utf-8').trim();
-  const [storedDate, storedCount] = content.split('.');
-  if (storedDate === today) {
-    buildNumber = parseInt(storedCount, 10) + 1;
-  }
-} catch {
-  // File doesn't exist yet, start from 1
-}
+const afterDate = `${year}-${month}-${day} 00:00:00`;
+const buildNumber = execSync(
+  `git log --oneline --after="${afterDate}" --before="${year}-${month}-${day} 23:59:59"`,
+  { encoding: 'utf-8' }
+).trim().split('\n').filter(Boolean).length;
 
 const version = `${today}.${buildNumber}`;
 writeFileSync(versionFile, version, 'utf-8');

@@ -92,7 +92,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="relative border-t border-white/5 py-6 text-center text-xs text-slate-600">
-        © {new Date().getFullYear()} NextGin. All rights reserved. | v-{process.env.BUILD_VERSION}
+        © {new Date().getFullYear()} NextGin. All rights reserved. | v.{process.env.BUILD_VERSION}
       </footer>
     </main>
   )
