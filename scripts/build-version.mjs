@@ -1,4 +1,7 @@
-import { execSync } from 'child_process';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+
+const versionFile = join(process.cwd(), '.build-version');
 
 const now = new Date();
 const year = now.getFullYear();
@@ -6,17 +9,18 @@ const month = String(now.getMonth() + 1).padStart(2, '0');
 const day = String(now.getDate()).padStart(2, '0');
 const today = `${year}${month}${day}`;
 
-let commitCount;
+let buildNumber = 1;
 
-if (process.env.BUILD_COUNT) {
-  commitCount = process.env.BUILD_COUNT;
-} else {
-  try {
-    // Fallback for local development
-    commitCount = execSync('git rev-list --count HEAD --since="00:00:00"').toString().trim();
-  } catch (e) {
-    commitCount = '0';
+try {
+  const content = readFileSync(versionFile, 'utf-8').trim();
+  const [storedDate, storedCount] = content.split('.');
+  if (storedDate === today) {
+    buildNumber = parseInt(storedCount, 10) + 1;
   }
+} catch {
+  // File doesn't exist yet, start from 1
 }
 
-console.log(`${today}.${commitCount}`);
+const version = `${today}.${buildNumber}`;
+writeFileSync(versionFile, version, 'utf-8');
+console.log(`Build version: ${version}`);
