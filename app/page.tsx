@@ -11,7 +11,7 @@ export default function HomePage() {
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 -left-40 w-150 h-150 rounded-full bg-blue-600/10 blur-3xl" />
         <div className="absolute -bottom-40 -right-40 w-150 h-150 rounded-full bg-indigo-600/10 blur-3xl" />
-      </div>``
+      </div>
 
       {/* Navbar */}
       <header className="relative flex justify-between items-center px-8 py-5 max-w-7xl w-full mx-auto border-b border-white/5">
