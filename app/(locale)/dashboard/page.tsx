@@ -26,7 +26,7 @@ export default function Dashboard() {
   const displayName = user?.name || user?.email || "User"
 
   return (
-    <main className="relative flex-1 max-w-3xl w-full mx-auto px-6 py-10">
+    <main className="relative flex-1 w-full max-w-5xl mx-auto px-6 py-10">
       {/* Welcome */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white tracking-tight">Dashboard</h1>
