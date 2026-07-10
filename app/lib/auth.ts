@@ -53,3 +53,16 @@ export async function googleLogin(token: string) {
 
   return res.json()
 }
+
+export async function isAdmin() {
+  const res = await fetch("/api/get-token")
+
+  if (!res.ok) throw new Error("Get token failed")
+
+  const { token } = await res.json()
+
+  if (!token) return false
+
+  const payload = JSON.parse(atob(token.split(".")[1]))
+  return payload?.is_admin || false
+}
