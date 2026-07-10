@@ -20,7 +20,3 @@ export const useAuth = create<AuthState>((set) => ({
   },
   setUser: (user) => set({ user }),
 }))
-
-if (typeof window !== "undefined") {
-  useAuth.getState().fetch()
-}
