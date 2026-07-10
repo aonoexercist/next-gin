@@ -3,7 +3,6 @@
 import { useEffect } from "react"
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
-import Todos from "./components/Todos"
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
@@ -26,15 +25,9 @@ export default function Dashboard() {
   const displayName = user?.name || user?.email || "User"
 
   return (
-    <main className="relative flex-1 w-full max-w-5xl mx-auto px-6 py-10">
-      {/* Welcome */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-white tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-sm text-slate-400">Welcome back, <span className="text-slate-200">{displayName}</span>.</p>
-      </div>
-
-      {/* Todos */}
-      <Todos />
-    </main>
+    <div className="mb-8">
+      <h1 className="text-2xl font-bold text-white tracking-tight">Dashboard</h1>
+      <p className="mt-1 text-sm text-slate-400">Welcome back, <span className="text-slate-200">{displayName}</span>.</p>
+    </div>
   )
 }

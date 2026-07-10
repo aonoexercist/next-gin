@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import GoogleLoginButton from "@/components/GoogleLoginButton"
 import GoogleProvider from "@/providers/GoogleProvider"
+import { AccountList, MicrosoftSignInButton } from "@chemmangat/msal-next"
+// import MicrosoftLogin from "@/components/MicrosoftLogin"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -108,8 +110,34 @@ export default function LoginPage() {
               <div className="flex-1 h-px bg-white/8" />
             </div>
 
-            <div className="flex justify-center">
+            <div className="flex flex-col gap-3">
               <GoogleLoginButton />
+              {/* <MicrosoftSignInButton 
+                onSuccess={() => {
+                  // Handle successful Microsoft login if needed
+                  console.log("Microsoft login successful");
+                  return null; // Return null to prevent automatic redirection
+                }}
+                onError={(error) => {
+                  // Handle Microsoft login error if needed
+                  console.error("Microsoft login error:", error);
+                }}
+                scopes={['User.Read']}
+              /> */}
+              <AccountList
+                showAvatars
+                showDetails
+                showActiveIndicator
+                clickToSwitch
+                orientation="vertical"  // 'vertical' | 'horizontal'
+                onAccountClick={(account) => {}}
+                // v5.0.0 — custom account row rendering
+                renderAccount={(account, isActive) => (
+                  <div style={{ color: isActive ? 'blue' : 'black' }}>
+                    {account.name} — {account.username}
+                  </div>
+                )}
+/>
             </div>
 
             <p className="mt-8 text-center text-xs text-slate-500">

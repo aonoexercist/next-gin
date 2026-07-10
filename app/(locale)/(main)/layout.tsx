@@ -8,7 +8,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <section className="flex-1 min-w-0">
         <NavBar />
-        {children}
+
+        <div className="w-full max-w-5xl mx-auto px-6 py-10">
+          {children}
+        </div>
       </section>
     </div>
   )
