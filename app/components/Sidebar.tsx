@@ -2,8 +2,8 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useAuth } from "@/hooks/useAuth"
 import { sidebarConfig } from "@/lib/sidebarConfig"
+import { useAuthContext } from "@/context/AuthContext"
 
 function getUserPermissions(permissions: string[] = []) {
   return new Set(permissions)
@@ -11,12 +11,12 @@ function getUserPermissions(permissions: string[] = []) {
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const { user, loading } = useAuth()
+  const { isAdmin, loading } = useAuthContext()
 
-  const rolePermissions = user?.roles?.flatMap((role) => role.permissions ?? []) ?? []
-  const permissions = getUserPermissions(rolePermissions)
+  // const rolePermissions = user?.roles?.flatMap((role) => role.permissions ?? []) ?? []
+  // const permissions = getUserPermissions(rolePermissions)
 
-  const visibleItems = sidebarConfig.filter((item) => permissions.has(item.requiredPermission))
+  const visibleItems = sidebarConfig.filter((item) => isAdmin)
 
   return (
     <aside className="w-full md:w-64 md:min-h-[calc(100vh-1px)] border-b md:border-b-0 md:border-r border-white/5 bg-slate-950/35 backdrop-blur-sm">
