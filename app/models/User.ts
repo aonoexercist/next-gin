@@ -2,7 +2,7 @@ export interface User {
   id?: string
   name: string;
   email: string;
-  roles: Role[];
+  permissions: Permission[];
 }
 
 export interface Role {
@@ -17,7 +17,6 @@ export interface UserRole {
 }
 
 export interface Permission {
-  id?: string
   name: string
 }
 
