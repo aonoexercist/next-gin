@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import { login } from "@/lib/auth"
+import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import GoogleLoginButton from "@/components/GoogleLoginButton"
 import GoogleProvider from "@/providers/GoogleProvider"
-import { AccountList, MicrosoftSignInButton } from "@chemmangat/msal-next"
 // import MicrosoftLogin from "@/components/MicrosoftLogin"
 
 export default function LoginPage() {
@@ -15,12 +15,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const fetchUser = useAuth((s) => s.fetch)
 
   const handleLogin = async () => {
     setError("")
     try {
       setLoading(true)
       await login(email, password)
+      await fetchUser()
       router.push("/dashboard")
     } catch (err) {
       console.error("Login error:", err)
@@ -124,20 +126,6 @@ export default function LoginPage() {
                 }}
                 scopes={['User.Read']}
               /> */}
-              <AccountList
-                showAvatars
-                showDetails
-                showActiveIndicator
-                clickToSwitch
-                orientation="vertical"  // 'vertical' | 'horizontal'
-                onAccountClick={(account) => {}}
-                // v5.0.0 — custom account row rendering
-                renderAccount={(account, isActive) => (
-                  <div style={{ color: isActive ? 'blue' : 'black' }}>
-                    {account.name} — {account.username}
-                  </div>
-                )}
-/>
             </div>
 
             <p className="mt-8 text-center text-xs text-slate-500">
