@@ -2,6 +2,10 @@ import { logout } from "./auth";
 
 let isRefreshing = false;
 
+type ApiFetchOptions = RequestInit & {
+  skipRefreshOnUnauthorized?: boolean;
+};
+
 type PendingRequest = {
   resolve: (res: Response) => void;
   reject: (err: unknown) => void;
@@ -13,22 +17,27 @@ let pendingRequests: PendingRequest[] = [];
 
 export async function apiFetch(
   endpoint: string,
-  options: RequestInit = {}
+  options: ApiFetchOptions = {}
 ): Promise<Response> {
   const url = `/api${endpoint}`;
+  const { skipRefreshOnUnauthorized = false, ...requestOptions } = options;
 
   const fetchOptions: RequestInit = {
-    ...options,
+    ...requestOptions,
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      ...(options.headers || {}),
+      ...(requestOptions.headers || {}),
     },
   };
 
   const res = await fetch(url, fetchOptions);
 
   if (res.status !== 401) {
+    return res;
+  }
+
+  if (skipRefreshOnUnauthorized) {
     return res;
   }
 
