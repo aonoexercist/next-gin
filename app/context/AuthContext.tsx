@@ -5,6 +5,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface AuthContextType {
   user: any;
+  isLoggedIn: boolean;
   permissions: string[];
   isAdmin: boolean;
   can: (permission: string) => boolean;
@@ -17,9 +18,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [_isAdmin, setIsAdmin] = useState(false);
 
-  // Subscribe reactively to the store instead of a one-off getState() snapshot
-  const userData = useAuth((s) => s.user);
   const fetchUser = useAuth((s) => s.fetch);
+  const userData = useAuth((s) => s.user);
+  const isLoggedIn = useAuth((s) => s.isLoggedIn);
 
   useEffect(() => {
     let cancelled = false;
@@ -27,11 +28,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const init = async () => {
       setLoading(true);
       try {
-        const [adminResult] = await Promise.all([
-          isAdmin(),
-          fetchUser(),
-        ]);
-        if (!cancelled) setIsAdmin(adminResult);
+        // fetchUser should hit /api/me and update the store's isLoggedIn/user
+        const loggedIn = await fetchUser();
+        if (!cancelled && loggedIn) {
+          const adminResult = await isAdmin();
+          if (!cancelled) setIsAdmin(adminResult);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -41,7 +43,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       cancelled = true;
     };
-  }, [fetchUser]);
+  }, [fetchUser, isLoggedIn]);
 
   const permissions = userData?.permissions?.map((role: any) => role.permissions).flat() || [];
 
@@ -51,7 +53,9 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user: userData, permissions, isAdmin: _isAdmin, can, loading }}>
+    <AuthContext.Provider
+      value={{ user: isLoggedIn ? userData : null, isLoggedIn, permissions, isAdmin: _isAdmin, can, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );
