@@ -7,16 +7,22 @@ import { User } from "@/models/User"
 type AuthState = {
   user: User | null
   loading: boolean
-  fetch: () => Promise<void>
+  isLoggedIn: boolean
+  fetch: () => Promise<boolean>
   setUser: (user: User | null) => void
+  setIsLoggedIn: (isLoggedIn: boolean) => void
 }
 
 export const useAuth = create<AuthState>((set) => ({
   user: null,
   loading: true,
+  isLoggedIn: false,
   fetch: async () => {
     const data = await getMe()
-    set({ user: data, loading: false })
+    const isLoggedIn = !!data
+    set({ user: data, loading: false, isLoggedIn })
+    return isLoggedIn
   },
   setUser: (user) => set({ user }),
+  setIsLoggedIn: (isLoggedIn) => set({ isLoggedIn }),
 }))
