@@ -1,9 +1,8 @@
 "use client"
 
-import { Fragment } from "react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, Fragment } from "react"
 import { ChevronDown, ChevronRight, Plus, Pencil, Trash2, X, Check } from "lucide-react"
-import { useRolesStore } from "@/hooks/useRolesStore" 
+import { useRolesStore } from "@/hooks/useRolesStore"
 
 const RolesPermissionsPage = () => {
   const roles = useRolesStore((s) => s.roles)
@@ -32,7 +31,7 @@ const RolesPermissionsPage = () => {
 
   // Permission add/edit state (scoped per role)
   const [newPermissionByRole, setNewPermissionByRole] = useState<Record<number, string>>({})
-  const [editingPermission, setEditingPermission] = useState<{ roleId: number; original: string } | null>(null)
+  const [editingPermissionId, setEditingPermissionId] = useState<number | null>(null)
   const [editPermissionValue, setEditPermissionValue] = useState("")
 
   useEffect(() => {
@@ -76,20 +75,20 @@ const RolesPermissionsPage = () => {
     setNewPermissionByRole((prev) => ({ ...prev, [roleId]: "" }))
   }
 
-  const handleStartEditPermission = (roleId: number, permission: string) => {
-    setEditingPermission({ roleId, original: permission })
-    setEditPermissionValue(permission)
+  const handleStartEditPermission = (permissionId: number, currentName: string) => {
+    setEditingPermissionId(permissionId)
+    setEditPermissionValue(currentName)
   }
 
-  const handleSaveEditPermission = async () => {
-    if (!editingPermission || !editPermissionValue.trim()) return
-    await updatePermission(editingPermission.roleId, editingPermission.original, editPermissionValue.trim())
-    setEditingPermission(null)
+  const handleSaveEditPermission = async (roleId: number, permissionId: number) => {
+    if (!editPermissionValue.trim()) return
+    await updatePermission(roleId, permissionId, editPermissionValue.trim())
+    setEditingPermissionId(null)
   }
 
-  const handleDeletePermission = async (roleId: number, permission: string) => {
-    if (!confirm(`Remove permission "${permission}" from this role?`)) return
-    await deletePermission(roleId, permission)
+  const handleDeletePermission = async (roleId: number, permissionId: number, name: string) => {
+    if (!confirm(`Remove permission "${name}" from this role?`)) return
+    await deletePermission(roleId, permissionId)
   }
 
   return (
@@ -166,7 +165,7 @@ const RolesPermissionsPage = () => {
 
                 return (
                   <Fragment key={role.id}>
-                    <tr key={role.id} className="hover:bg-slate-800/40">
+                    <tr className="hover:bg-slate-800/40">
                       <td className="px-4 py-3 text-slate-400 cursor-pointer" onClick={() => handleToggle(role.id)}>
                         {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                       </td>
@@ -199,10 +198,7 @@ const RolesPermissionsPage = () => {
                               >
                                 <Check size={15} />
                               </button>
-                              <button
-                                onClick={() => setEditingRoleId(null)}
-                                className="text-slate-400 hover:text-slate-200 p-1"
-                              >
+                              <button onClick={() => setEditingRoleId(null)} className="text-slate-400 hover:text-slate-200 p-1">
                                 <X size={15} />
                               </button>
                             </>
@@ -228,7 +224,7 @@ const RolesPermissionsPage = () => {
                     </tr>
 
                     {isExpanded && (
-                      <tr key={`${role.id}-permissions`} className="bg-slate-900/80">
+                      <tr className="bg-slate-900/80">
                         <td colSpan={4} className="px-4 py-3">
                           {isLoadingPermissions && (
                             <p className="text-slate-400 text-sm">Loading permissions...</p>
@@ -242,31 +238,31 @@ const RolesPermissionsPage = () => {
                                 )}
 
                                 {(permissions ?? []).map((permission) => {
-                                  const isEditingThis =
-                                    editingPermission?.roleId === role.id &&
-                                    editingPermission?.original === permission
+                                  const isEditingThis = editingPermissionId === permission.id
 
                                   if (isEditingThis) {
                                     return (
                                       <div
-                                        key={permission}
+                                        key={permission.id}
                                         className="flex items-center gap-1 rounded-full border border-blue-500 bg-slate-800 px-2 py-1"
                                       >
                                         <input
                                           autoFocus
                                           value={editPermissionValue}
                                           onChange={(e) => setEditPermissionValue(e.target.value)}
-                                          onKeyDown={(e) => e.key === "Enter" && handleSaveEditPermission()}
+                                          onKeyDown={(e) =>
+                                            e.key === "Enter" && handleSaveEditPermission(role.id, permission.id)
+                                          }
                                           className="w-32 bg-transparent text-xs text-white outline-none"
                                         />
                                         <button
-                                          onClick={handleSaveEditPermission}
+                                          onClick={() => handleSaveEditPermission(role.id, permission.id)}
                                           className="text-green-400 hover:text-green-300"
                                         >
                                           <Check size={13} />
                                         </button>
                                         <button
-                                          onClick={() => setEditingPermission(null)}
+                                          onClick={() => setEditingPermissionId(null)}
                                           className="text-slate-400 hover:text-slate-200"
                                         >
                                           <X size={13} />
@@ -277,18 +273,18 @@ const RolesPermissionsPage = () => {
 
                                   return (
                                     <span
-                                      key={permission}
+                                      key={permission.id}
                                       className="group flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800/60 px-3 py-1 text-xs text-slate-200"
                                     >
-                                      {permission}
+                                      {permission.name}
                                       <button
-                                        onClick={() => handleStartEditPermission(role.id, permission)}
+                                        onClick={() => handleStartEditPermission(permission.id, permission.name)}
                                         className="text-slate-500 hover:text-blue-400"
                                       >
                                         <Pencil size={11} />
                                       </button>
                                       <button
-                                        onClick={() => handleDeletePermission(role.id, permission)}
+                                        onClick={() => handleDeletePermission(role.id, permission.id, permission.name)}
                                         className="text-slate-500 hover:text-red-400"
                                       >
                                         <X size={11} />
