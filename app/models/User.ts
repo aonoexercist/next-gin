@@ -1,8 +1,8 @@
 export interface User {
-  id?: string
+  id?: string | number;
   name: string;
   email: string;
-  permissions: Permission[];
+  roles: string[];
 }
 
 export interface Role {
