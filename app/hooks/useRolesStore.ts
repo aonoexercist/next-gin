@@ -4,10 +4,14 @@ import { create } from "zustand"
 import { apiFetch } from "@/lib/api"
 import { UserRole } from "@/models/User"
 
+type Permission = {
+  id: number
+  name: string
+}
 
 type RolesState = {
   roles: UserRole[]
-  permissionsByRoleId: Record<number, string[]>
+  permissionsByRoleId: Record<number, Permission[]>
   loadingRoleIds: Set<number>
   mutatingRoleIds: Set<number>
 
@@ -19,9 +23,9 @@ type RolesState = {
   updateRole: (roleId: number, name: string) => Promise<void>
   deleteRole: (roleId: number) => Promise<void>
 
-  addPermission: (roleId: number, permission: string) => Promise<void>
-  updatePermission: (roleId: number, oldPermission: string, newPermission: string) => Promise<void>
-  deletePermission: (roleId: number, permission: string) => Promise<void>
+  addPermission: (roleId: number, name: string) => Promise<void>
+  updatePermission: (roleId: number, permissionId: number, name: string) => Promise<void>
+  deletePermission: (roleId: number, permissionId: number) => Promise<void>
 }
 
 const fetchRoles = async (): Promise<UserRole[]> => {
@@ -30,7 +34,7 @@ const fetchRoles = async (): Promise<UserRole[]> => {
   return await res.json()
 }
 
-const fetchPermissionsByRoleId = async (roleId: number): Promise<string[]> => {
+const fetchPermissionsByRoleId = async (roleId: number): Promise<Permission[]> => {
   const res = await apiFetch(`/admin/permissions/roles/${roleId}/permissions`)
   if (!res.ok) return []
   return await res.json()
@@ -124,56 +128,52 @@ export const useRolesStore = create<RolesState>((set, get) => ({
     })
   },
 
-  // ---- Permission CRUD (scoped to a role) ----
+  // ---- Permission CRUD ----
 
-  addPermission: async (roleId, permission) => {
+  addPermission: async (roleId, name) => {
     const res = await apiFetch(`/admin/permissions/roles/${roleId}/permissions`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ permission })
+      body: JSON.stringify({ name })
+    })
+    if (!res.ok) return
+
+    const created: Permission = await res.json()
+
+    set((s) => ({
+      permissionsByRoleId: {
+        ...s.permissionsByRoleId,
+        [roleId]: [...(s.permissionsByRoleId[roleId] ?? []), created]
+      }
+    }))
+  },
+
+  updatePermission: async (roleId, permissionId, name) => {
+    const res = await apiFetch(`/admin/permissions/${permissionId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name })
     })
     if (!res.ok) return
 
     set((s) => ({
       permissionsByRoleId: {
         ...s.permissionsByRoleId,
-        [roleId]: [...(s.permissionsByRoleId[roleId] ?? []), permission]
-      }
-    }))
-  },
-
-  updatePermission: async (roleId, oldPermission, newPermission) => {
-    const res = await apiFetch(
-      `/admin/permissions/roles/${roleId}/permissions/${encodeURIComponent(oldPermission)}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ permission: newPermission })
-      }
-    )
-    if (!res.ok) return
-
-    set((s) => ({
-      permissionsByRoleId: {
-        ...s.permissionsByRoleId,
         [roleId]: (s.permissionsByRoleId[roleId] ?? []).map((p) =>
-          p === oldPermission ? newPermission : p
+          p.id === permissionId ? { ...p, name } : p
         )
       }
     }))
   },
 
-  deletePermission: async (roleId, permission) => {
-    const res = await apiFetch(
-      `/admin/permissions/roles/${roleId}/permissions/${encodeURIComponent(permission)}`,
-      { method: "DELETE" }
-    )
+  deletePermission: async (roleId, permissionId) => {
+    const res = await apiFetch(`/admin/permissions/roles/${roleId}/permissions/${permissionId}`, { method: "DELETE" })
     if (!res.ok) return
 
     set((s) => ({
       permissionsByRoleId: {
         ...s.permissionsByRoleId,
-        [roleId]: (s.permissionsByRoleId[roleId] ?? []).filter((p) => p !== permission)
+        [roleId]: (s.permissionsByRoleId[roleId] ?? []).filter((p) => p.id !== permissionId)
       }
     }))
   }
