@@ -38,6 +38,9 @@ const UserPage = () => {
   const [editEmail, setEditEmail] = useState("")
   const [isSavingEdit, setIsSavingEdit] = useState(false)
 
+  const [removingRole, setRemovingRole] = useState<string | null>(null) // `${userId}:${roleId}`
+  const removeRole = useUsersStore((state) => state.removeRole)
+
   useEffect(() => {
     Promise.all([loadUsers(), loadRoles?.()]).finally(() => setIsLoading(false))
   }, [loadUsers, loadRoles])
@@ -173,6 +176,21 @@ const UserPage = () => {
     }
   }
 
+  const handleRemoveRole = async (userId: string, roleId: number, roleName: string) => {
+    if (!confirm(`Remove the "${roleName}" role from this user?`)) return
+
+    const key = `${userId}:${roleId}`
+    try {
+      setRemovingRole(key)
+      await removeRole(userId, roleId)
+    } catch (err) {
+      console.error("Failed to remove role", err)
+      alert("Failed to remove role.")
+    } finally {
+      setRemovingRole(null)
+    }
+  }
+
   const openMenuUser = users.find((u) => String(u.id) === openMenuId) ?? null
   const buildRolesTooltip = (userRoles: any[]) =>
     userRoles
@@ -222,15 +240,30 @@ const UserPage = () => {
                     <td className="px-4 py-3">{user.email}</td>
                     <td className="px-4 py-3 text-slate-300">
                       {hasRoles ? (
-                        <span
-                          className="cursor-default underline decoration-dotted decoration-slate-600 underline-offset-4"
-                          title={buildRolesTooltip(user.roles as any[])}
-                        >
-                          {(user.roles as any[])
-                            .map((role) => role?.name)
-                            .filter((name: any): name is string => Boolean(name))
-                            .join(", ")}
-                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(user.roles as any[]).map((role) => {
+                            const roleId = Number(role.id)
+                            const key = `${userId}:${roleId}`
+                            const isRemoving = removingRole === key
+                            return (
+                              <span
+                                key={roleId}
+                                title={`${role.name}: ${role.permissions?.length ? role.permissions.join(", ") : "no permissions"}`}
+                                className="inline-flex items-center gap-1 rounded-full border border-slate-700 bg-slate-800/80 pl-2.5 pr-1 py-0.5 text-xs text-slate-200"
+                              >
+                                {role.name}
+                                <button
+                                  onClick={() => handleRemoveRole(userId, roleId, role.name)}
+                                  disabled={isRemoving}
+                                  aria-label={`Remove ${role.name} role`}
+                                  className="inline-flex h-4 w-4 items-center justify-center rounded-full text-slate-400 hover:bg-slate-700 hover:text-red-400 disabled:opacity-50"
+                                >
+                                  {isRemoving ? "…" : "×"}
+                                </button>
+                              </span>
+                            )
+                          })}
+                        </div>
                       ) : (
                         "-"
                       )}
