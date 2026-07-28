@@ -5,18 +5,18 @@ import { usePathname } from "next/navigation"
 import { sidebarConfig } from "@/lib/sidebarConfig"
 import { useAuthContext } from "@/context/AuthContext"
 
-function getUserPermissions(permissions: string[] = []) {
-  return new Set(permissions)
-}
-
 export default function Sidebar() {
   const pathname = usePathname()
-  const { isAdmin, loading } = useAuthContext()
+  const { isAdmin, loading, can } = useAuthContext()
 
-  // const rolePermissions = user?.roles?.flatMap((role) => role.permissions ?? []) ?? []
-  // const permissions = getUserPermissions(rolePermissions)
-
-  const visibleItems = sidebarConfig.filter((item) => isAdmin)
+  const visibleItems = sidebarConfig.filter((item) => {
+    // No requiredPermission -> always visible
+    if (!item.requiredPermission) return true
+    // Admins bypass permission checks
+    if (isAdmin) return true
+    // Otherwise check the user's permissions
+    return can(item.requiredPermission)
+  })
 
   return (
     <aside className="w-full md:w-64 md:min-h-[calc(100vh-1px)] border-b md:border-b-0 md:border-r border-white/5 bg-slate-950/35 backdrop-blur-sm">
