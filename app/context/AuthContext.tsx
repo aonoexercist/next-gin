@@ -45,9 +45,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, [fetchUser, isLoggedIn]);
 
-  const permissions = userData?.permissions?.map((role: any) => role.permissions).flat() || [];
+  console.log('AuthProvider userData:', userData);
+  const permissions = userData?.permissions?.map((permission: string) => permission).flat() || [];
+  console.log('AuthProvider permissions:', permissions);
 
   const can = (permission: string) => {
+    console.log('Checking permission:', permission, 'for user permissions:', permissions);
     if (_isAdmin) return true;
     return permissions.includes(permission);
   };
