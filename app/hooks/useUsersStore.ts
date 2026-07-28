@@ -11,6 +11,7 @@ type UsersState = {
   deleteUser: (id: string) => Promise<void>
   updateUser: (id: string, data: Partial<User>) => Promise<void>
   assignRoles: (userId: string, roleIds: number[]) => Promise<void>
+  removeRole: (userId: string, roleId: number) => Promise<void>
 }
 
 const fetchUsers = async (): Promise<User[]> => {
@@ -61,4 +62,19 @@ export const useUsersStore = create<UsersState>((set, get) => ({
       users: get().users.map((u) => (String(u.id) === String(userId) ? updated : u)),
     })
   },
+
+   removeRole: async (userId: string, roleId: number) => {
+    const res = await apiFetch(`/admin/users/${userId}/roles/${roleId}`, {
+      method: "DELETE",
+    })
+    if (!res.ok) throw new Error("Failed to remove role")
+
+    set({
+      users: get().users.map((u) =>
+        String(u.id) === String(userId)
+          ? { ...u, roles: (u.roles as any[] ?? []).filter((r: any) => Number(r.id) !== roleId) }
+          : u
+      ),
+    })
+  },  
 }))
