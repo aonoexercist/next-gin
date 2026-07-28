@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-
-const publicRoutes = ["/login", "/register"];
-const protectedRoutes = ["/dashboard"];
-
-
+const publicRoutes = ["/login", "/register"]
+const protectedRoutes = ["/dashboard"]
+const authRedirectRoutes = ["/", "/login", "/register"] // routes a logged-in user shouldn't see
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -16,23 +14,25 @@ export async function proxy(request: NextRequest) {
   // Protected routes
   const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
 
-  // Public routes
-  const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route))
+  // Routes that should redirect logged-in users to dashboard
+  const isAuthRedirectRoute = authRedirectRoutes.some((route) =>
+    route === "/" ? pathname === "/" : pathname.startsWith(route)
+  )
 
-  // 🚫 If NOT logged in and trying to access protected route
+  // 🚫 Not logged in and trying to access protected route
   if (isProtectedRoute && !accessToken) {
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  // 🔁 If logged in and trying to access login/register
-  if (isPublicRoute && accessToken) {
+  // 🔁 Logged in and trying to access "/", "/login", or "/register"
+  if (isAuthRedirectRoute && accessToken) {
     return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 
   return NextResponse.next()
 }
 
-// Apply middleware to specific routes
+// Apply proxy to specific routes
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/register", "/api/:path*"],
+  matcher: ["/", "/dashboard/:path*", "/login", "/register"],
 }
