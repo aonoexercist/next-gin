@@ -19,11 +19,8 @@ export const useAuth = create<AuthState>((set) => ({
   isLoggedIn: false,
   fetch: async () => {
     const data = await getMe()
-    console.log("Fetched user data:", data)
     const isLoggedIn = !!data
     set({ user: data, loading: false, isLoggedIn })
-
-    console.log("Updated auth state:", { user: data, loading: false, isLoggedIn })
     return isLoggedIn
   },
   setUser: (user) => set({ user }),
