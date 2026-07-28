@@ -5,6 +5,13 @@ export interface User {
   roles: string[];
 }
 
+export interface CurrentUser {
+  id?: string | number;
+  name: string;
+  email: string;
+  permissions: string[];
+}
+
 export interface Role {
   name: string;
   permissions: string[];
