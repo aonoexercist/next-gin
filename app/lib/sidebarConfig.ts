@@ -22,6 +22,5 @@ export const sidebarConfig: SidebarItem[] = [
   {
     name: "Todos",
     path: "/todos",
-    requiredPermission: "todo:read",
   },
 ]
