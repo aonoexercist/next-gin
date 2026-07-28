@@ -3,7 +3,7 @@
 import { useAuth } from "@/hooks/useAuth"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { logout } from "@/lib/auth"
+import { isAdmin, logout } from "@/lib/auth"
 
 export default function NavBar() {
   const { user, loading } = useAuth()
@@ -16,7 +16,7 @@ export default function NavBar() {
     } catch (err) {
       console.error("Logout failed", err)
     } finally {
-      router.push("/login")
+      window.location.assign("/login")
     }
   }
 
@@ -27,7 +27,6 @@ export default function NavBar() {
     : user.email?.[0].toUpperCase() ?? "?"
 
   const displayName = user.name || user.email || "User"
-  const isSuperAdmin = user.roles?.some((r) => r.name === "super_admin")
 
   return (
     <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/2 backdrop-blur-sm">
@@ -37,15 +36,6 @@ export default function NavBar() {
       </Link>
 
       <div className="flex items-center gap-3">
-        {isSuperAdmin && (
-          <Link
-            href="/admin"
-            className="px-3 py-1.5 text-xs font-medium bg-purple-500/15 border border-purple-500/30 text-purple-300 hover:bg-purple-500/25 rounded-lg transition"
-          >
-            Admin panel
-          </Link>
-        )}
-
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full bg-blue-600/30 border border-blue-500/30 flex items-center justify-center text-xs font-bold text-blue-300">
             {initials}
