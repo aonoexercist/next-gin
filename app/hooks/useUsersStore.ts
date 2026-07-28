@@ -31,7 +31,7 @@ export const useUsersStore = create<UsersState>((set, get) => ({
     const res = await apiFetch(`/admin/users/${id}`, { method: "DELETE" })
     if (!res.ok) throw new Error("Failed to delete user")
 
-    set({ users: get().users.filter((u) => u.id !== id) })
+    set({ users: get().users.filter((u) => String(u.id) !== String(id)) })
   },
 
   updateUser: async (id, data) => {
@@ -44,7 +44,7 @@ export const useUsersStore = create<UsersState>((set, get) => ({
 
     const updated: User = await res.json()
     set({
-      users: get().users.map((u) => (u.id === id ? updated : u)),
+      users: get().users.map((u) => (String(u.id) === String(id) ? updated : u)),
     })
   },
 
@@ -58,7 +58,7 @@ export const useUsersStore = create<UsersState>((set, get) => ({
 
     const updated: User = await res.json()
     set({
-      users: get().users.map((u) => (u.id === userId ? updated : u)),
+      users: get().users.map((u) => (String(u.id) === String(userId) ? updated : u)),
     })
   },
 }))
