@@ -1,9 +1,12 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useLayoutEffect } from "react"
+import { createPortal } from "react-dom"
 import { useUsersStore } from "@/hooks/useUsersStore"
 import { useRolesStore } from "@/hooks/useRolesStore"
 import { User } from "@/models/User"
+
+type MenuPosition = { top: number; left: number; openUpward: boolean }
 
 const UserPage = () => {
   const users = useUsersStore((state) => state.users)
@@ -20,7 +23,9 @@ const UserPage = () => {
 
   // Dropdown menu (which row's menu is open)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
+  const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   // Assign-role modal
   const [assignModalUser, setAssignModalUser] = useState<User | null>(null)
@@ -37,19 +42,64 @@ const UserPage = () => {
     Promise.all([loadUsers(), loadRoles?.()]).finally(() => setIsLoading(false))
   }, [loadUsers, loadRoles])
 
-  // Close dropdown when clicking outside of it
+  // Close dropdown when clicking outside of it (checks both the button and the portal menu)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      const target = e.target as Node
+      const clickedButton = openMenuId ? buttonRefs.current[openMenuId]?.contains(target) : false
+      const clickedMenu = menuRef.current?.contains(target)
+      if (!clickedButton && !clickedMenu) {
         setOpenMenuId(null)
+        setMenuPosition(null)
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+  }, [openMenuId])
+
+  // Reposition/close on scroll or resize so the menu never drifts from its button
+  useEffect(() => {
+    if (!openMenuId) return
+    const close = () => {
+      setOpenMenuId(null)
+      setMenuPosition(null)
+    }
+    window.addEventListener("scroll", close, true)
+    window.addEventListener("resize", close)
+    return () => {
+      window.removeEventListener("scroll", close, true)
+      window.removeEventListener("resize", close)
+    }
+  }, [openMenuId])
+
+  const MENU_WIDTH = 160 // matches w-40
+  const MENU_HEIGHT_ESTIMATE = 130 // ~3 items + divider, used to decide open-up vs open-down
+
+  const toggleMenu = (userId: string) => {
+    if (openMenuId === userId) {
+      setOpenMenuId(null)
+      setMenuPosition(null)
+      return
+    }
+
+    const btn = buttonRefs.current[userId]
+    if (btn) {
+      const rect = btn.getBoundingClientRect()
+      const spaceBelow = window.innerHeight - rect.bottom
+      const openUpward = spaceBelow < MENU_HEIGHT_ESTIMATE && rect.top > MENU_HEIGHT_ESTIMATE
+
+      setMenuPosition({
+        top: openUpward ? rect.top - 4 : rect.bottom + 4,
+        left: Math.min(rect.right - MENU_WIDTH, window.innerWidth - MENU_WIDTH - 8),
+        openUpward,
+      })
+    }
+    setOpenMenuId(userId)
+  }
 
   const handleDelete = async (user: User) => {
     setOpenMenuId(null)
+    setMenuPosition(null)
     if (!user.id) return // guard against missing id
     if (!confirm(`Delete ${user.name}? This cannot be undone.`)) return
     try {
@@ -65,6 +115,7 @@ const UserPage = () => {
 
   const openEditModal = (user: User) => {
     setOpenMenuId(null)
+    setMenuPosition(null)
     setEditModalUser(user)
     setEditName(user.name)
     setEditEmail(user.email)
@@ -92,6 +143,7 @@ const UserPage = () => {
 
   const openAssignModal = (user: User) => {
     setOpenMenuId(null)
+    setMenuPosition(null)
     setAssignModalUser(user)
     setSelectedRoleIds(user.roles?.map((r: any) => Number(r.id)) ?? [])
   }
@@ -120,6 +172,12 @@ const UserPage = () => {
       setIsSavingRoles(false)
     }
   }
+
+  const openMenuUser = users.find((u) => String(u.id) === openMenuId) ?? null
+  const buildRolesTooltip = (userRoles: any[]) =>
+    userRoles
+      .map((r) => `${r.name}: ${r.permissions?.length ? r.permissions.join(", ") : "no permissions"}`)
+      .join("\n")
 
   return (
     <div className="p-4">
@@ -154,24 +212,37 @@ const UserPage = () => {
             )}
 
             {!isLoading &&
-              users.map((user) => (
-                <tr key={user.id ?? `${user.email}-${user.name}`} className="hover:bg-slate-800/40">
-                  <td className="px-4 py-3">{user.name}</td>
-                  <td className="px-4 py-3">{user.email}</td>
-                  <td className="px-4 py-3 text-slate-300">
-                    {(user.roles?.length ?? 0) > 0
-                      ? user.roles
-                          ?.map((role: any) => role?.name)
-                          .filter((name: any): name is string => Boolean(name))
-                          .join(", ")
-                      : "-"}
-                  </td>
-                  <td className="px-4 py-3 text-right relative">
-                    <div ref={openMenuId === String(user.id) ? menuRef : null}>
+              users.map((user) => {
+                const userId = String(user.id ?? "")
+                const hasRoles = (user.roles?.length ?? 0) > 0
+
+                return (
+                  <tr key={user.id ?? `${user.email}-${user.name}`} className="hover:bg-slate-800/40">
+                    <td className="px-4 py-3">{user.name}</td>
+                    <td className="px-4 py-3">{user.email}</td>
+                    <td className="px-4 py-3 text-slate-300">
+                      {hasRoles ? (
+                        <span
+                          className="cursor-default underline decoration-dotted decoration-slate-600 underline-offset-4"
+                          title={buildRolesTooltip(user.roles as any[])}
+                        >
+                          {(user.roles as any[])
+                            .map((role) => role?.name)
+                            .filter((name: any): name is string => Boolean(name))
+                            .join(", ")}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right relative">
                       <button
+                        ref={(el) => {
+                          buttonRefs.current[userId] = el
+                        }}
                         onClick={(e) => {
                           e.stopPropagation()
-                          setOpenMenuId(openMenuId === String(user.id) ? null : String(user.id ?? ""))
+                          toggleMenu(userId)
                         }}
                         className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800 hover:text-slate-200"
                         aria-label="Open actions menu"
@@ -185,38 +256,55 @@ const UserPage = () => {
                           <path d="M10 3a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 8.5a1.5 1.5 0 110 3 1.5 1.5 0 010-3zM10 14a1.5 1.5 0 110 3 1.5 1.5 0 010-3z" />
                         </svg>
                       </button>
-
-                      {openMenuId === String(user.id) && (
-                        <div className="absolute right-4 top-10 z-20 w-40 rounded-md border border-slate-700 bg-slate-800 shadow-lg py-1">
-                          <button
-                            onClick={() => openEditModal(user)}
-                            className="block w-full px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700"
-                          >
-                            Edit user
-                          </button>
-                          <button
-                            onClick={() => openAssignModal(user)}
-                            className="block w-full px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700"
-                          >
-                            Assign role
-                          </button>
-                          <div className="my-1 border-t border-slate-700" />
-                          <button
-                            onClick={() => handleDelete(user)}
-                            disabled={deletingId === String(user.id)}
-                            className="block w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-red-950/40 disabled:opacity-50"
-                          >
-                            {deletingId === String(user.id) ? "Deleting..." : "Delete user"}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                )
+              })}
           </tbody>
         </table>
       </div>
+
+      {/* Actions dropdown — rendered in a portal so it can never be clipped by the
+          table's scroll container (overflow-x-auto implicitly makes overflow-y "auto" too,
+          which was cutting the menu off at the container edge). */}
+      {openMenuId &&
+        menuPosition &&
+        openMenuUser &&
+        createPortal(
+          <div
+            ref={menuRef}
+            style={{
+              position: "fixed",
+              top: menuPosition.openUpward ? undefined : menuPosition.top,
+              bottom: menuPosition.openUpward ? window.innerHeight - menuPosition.top : undefined,
+              left: menuPosition.left,
+              width: 160,
+            }}
+            className="z-50 rounded-md border border-slate-700 bg-slate-800 shadow-lg py-1"
+          >
+            <button
+              onClick={() => openEditModal(openMenuUser)}
+              className="block w-full px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700"
+            >
+              Edit user
+            </button>
+            <button
+              onClick={() => openAssignModal(openMenuUser)}
+              className="block w-full px-3 py-2 text-left text-sm text-slate-200 hover:bg-slate-700"
+            >
+              Assign role
+            </button>
+            <div className="my-1 border-t border-slate-700" />
+            <button
+              onClick={() => handleDelete(openMenuUser)}
+              disabled={deletingId === String(openMenuUser.id)}
+              className="block w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-red-950/40 disabled:opacity-50"
+            >
+              {deletingId === String(openMenuUser.id) ? "Deleting..." : "Delete user"}
+            </button>
+          </div>,
+          document.body
+        )}
 
       {/* Assign Role modal */}
       {assignModalUser && (
