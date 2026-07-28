@@ -2,14 +2,14 @@
 
 import { create } from "zustand"
 import { getMe } from "@/lib/auth"
-import { User } from "@/models/User"
+import { CurrentUser } from "@/models/User"
 
 type AuthState = {
-  user: User | null
+  user: CurrentUser | null
   loading: boolean
   isLoggedIn: boolean
   fetch: () => Promise<boolean>
-  setUser: (user: User | null) => void
+  setUser: (user: CurrentUser | null) => void
   setIsLoggedIn: (isLoggedIn: boolean) => void
 }
 
@@ -19,8 +19,11 @@ export const useAuth = create<AuthState>((set) => ({
   isLoggedIn: false,
   fetch: async () => {
     const data = await getMe()
+    console.log("Fetched user data:", data)
     const isLoggedIn = !!data
     set({ user: data, loading: false, isLoggedIn })
+
+    console.log("Updated auth state:", { user: data, loading: false, isLoggedIn })
     return isLoggedIn
   },
   setUser: (user) => set({ user }),
